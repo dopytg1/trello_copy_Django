@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  <div class="main_boards" style="
+  background: url('http://127.0.0.1:8000/{{ board.background }}') no-repeat center top fixed; -webkit-background-size: cover; 
+  -moz-background-size: cover;
+  -o-background-size: cover; 
+  background-size: cover;">
+
+        <div class="header_board">
+          <h4>{{ board }}</h4>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Add users to the board" >
+            <button class="btn btn-primary" type="submit">Add</button>
+
+          </form>
+          <div class="btn-group dropstart">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              Settings
+            </button>
+
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Change board</a></li>
+              <li><a class="dropdown-item" href="{% url 'delete_board' id=board.pk %}">Delete board</a></li>
+            </ul>
+          </div>
+          
+        </div>
+
+      <div class="columns_main">
+        
+        
+        {% for column in columns %}
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <div class="column_head">
+                    <h5 class="card-title">{{ column.title }}</h5>
+
+                    <div class="dropdown-center">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        ...
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'delete_column' board_id=board_id column_id=column.pk %}">Delete column</a></li>
+                        <li><a class="dropdown-item" href="#">Change column</a></li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {% for card in column.cards_inside.all %}
+                    <a href="{% url 'inside_the_card' board_id=board_id card_id=card.pk %}">
+                      <div class="column_body">
+                        <div class="card_main">
+                          <p>{{ card.title }}</p>
+                            
+                            
+                        </div>
+                      </div>
+                    </a>
+                  {% endfor %}
+
+                  <div class="dropdown">
+                    <a class="btn btn-primary dropdown-toggle btn_under_column" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      add card
+                    </a>
+
+                    <ul class="dropdown-menu">
+                      <form method="POST" enctype="multipart/form-data">
+                        {%  csrf_token %}
+                        <div class="modal-body">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Head</span>
+                                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="head">
+                            </div>
+                            <input type="hidden" value="{{ column.pk }}" name="column_value">
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary" name="add_card">Create</button>
+                        </div>
+        
+                      </form>
+                    </ul>
+                  </div>
+
+
+                </div>
+            </div>
+        {% endfor %}
+
+            <button type="button" class="btn btn-success btn_add_column" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Add column
+            </button>
+      </div>
+
+
+    <!-- Modal add column -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">hello {{ request.user.username }}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {%  csrf_token %}
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Title</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="title">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary" name="add_column">Create</button>
+                </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+  </div>
+
+  
+{% endblock %}

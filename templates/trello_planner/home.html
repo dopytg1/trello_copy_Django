@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row row-cols-1 row-cols-md-2  row-cols-lg-3 row-cols-xl-3 g-4 mt-5">
+        <button type="button" class="btn btn-primary btn_create_board" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Create board
+        </button>
+
+        {% for board in boards %}
+          <a href="{% url 'boards' id=board.id %}" class="board_title">
+            {% if board.background %}
+            <div class="board-main" style="
+            background: url('http://127.0.0.1:8000/{{ board.background }}') no-repeat center top; -webkit-background-size: cover; 
+            -moz-background-size: cover;
+            -o-background-size: cover; 
+            background-size: cover;">
+              {{ board.title }}
+            </div>
+            {% else %}
+            <div class="board-main">
+              {{ board.title }}
+            </div>
+            {% endif %}
+          </a>
+        {% endfor %}
+    </div>
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">hello {{ request.user.username }}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {%  csrf_token %}
+                <div class="modal-body">
+                  {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary" >Create</button>
+                </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+</div>
+{% endblock %}
