@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 
 from .forms import AddBoardForm
-from .models import Board, Column, Card
+from .models import Board, Column, Card, Comment
 
 @login_required(login_url='/login')
 def home(request):
@@ -68,7 +68,7 @@ def delete_column(request, board_id, column_id ):
     except Column.DoesNotExist:
          HttpResponseNotFound("<h2>Column not found</h2>")
 
-
+@login_required(login_url='/login')
 def delete_board(request, id):
     try:
         board = Board.objects.get(pk=id)
@@ -77,14 +77,43 @@ def delete_board(request, id):
         return redirect('home')
     except Board.DoesNotExist:
          HttpResponseNotFound("<h2>Board not found</h2>")
-         
+
+
+@login_required(login_url='/login')
+def delete_card(request, board_id, card_id):
+    try:
+        card = Card.objects.get(pk=card_id)
+
+        card.delete()
+        return redirect('boards', board_id)
+    except Card.DoesNotExist:
+         HttpResponseNotFound("<h2>Card not found</h2>")
 
 @login_required(login_url='/login')
 def inside_the_card(request, board_id, card_id):
+    board = Board.objects.get(pk=board_id)
     card = Card.objects.get(pk=card_id)
+    comments = Comment.objects.filter(card_id=card)
+
+    if request.method == "POST":
+        if 'comments_creation_form' in request.POST:
+            comment_body = request.POST.get('comment_body')
+
+            comment = Comment.objects.create(author=request.user.username, body=comment_body, card_id=card)
+            comment.save()
+            return redirect('inside_the_card', board_id, card_id)
+        if 'card_description' in request.POST:
+            description = request.POST.get('description')
+
+            card.description = description
+            card.save()
+            return redirect('inside_the_card', board_id, card_id)
 
     context = {
-        'card_id': card_id,
-        'card': card
+        'board': board,
+        'card': card,
+        'comments': comments
     }
     return render(request, 'trello_planner/inside_the_card.html', context)
+
+
