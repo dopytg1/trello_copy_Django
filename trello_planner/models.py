@@ -37,7 +37,6 @@ class Column(models.Model):
         return self.title
 
 
-
 class CheckList(models.Model):
     title = models.CharField(max_length=50)
     is_checked = models.BooleanField(default=False)
@@ -46,6 +45,9 @@ class CheckList(models.Model):
 
     def __str__(self):
         return self.title
+
+# class CheckListElement(models.Model):
+#     title = models.CharField()
 
 class Mark(models.Model):
     hex_color = models.CharField(max_length=10)

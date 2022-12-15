@@ -7,7 +7,9 @@
   -moz-background-size: cover;
   -o-background-size: cover; 
   background-size: cover;
-  min-height: 100vh;">
+  min-height: 100vh;
+  background-color: brown !important;
+  ">
 
         <div class="header_board">
           <h4>{{ board }}</h4>
@@ -20,9 +22,9 @@
             <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               Settings
             </button>
-
+            
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Change board</a></li>
+              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#board_change">Change board</a></li>
               <li><a class="dropdown-item" href="{% url 'delete_board' id=board.pk %}">Delete board</a></li>
             </ul>
           </div>
@@ -101,7 +103,7 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">hello {{ request.user.username }}</h1>
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add new column</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" enctype="multipart/form-data">
@@ -121,6 +123,30 @@
           </div>
         </div>
       </div>
+
+    <!-- Modal board change -->
+    <div class="modal fade" id="board_change" tabindex="-1" aria-labelledby="board_change" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Change your board</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form method="POST" enctype="multipart/form-data">
+              {%  csrf_token %}
+              <div class="modal-body">
+                {{ form_change_board.as_p }}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" name="change_board">Change</button>
+              </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   

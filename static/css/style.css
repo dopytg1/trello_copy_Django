@@ -87,7 +87,9 @@ body {
     padding: 20px 0;
 }
 
-
+.dropdown-item:hover {
+    cursor: pointer;
+}
 /* INSIDE THE CARDS */
 
 .card_header {
@@ -115,6 +117,23 @@ body {
 }
 .comment_card_section {
     padding-bottom: 30px;
+}
+.mark_select {
+    margin-bottom: 30px;
+}
+.marks_section {
+    color: white;
+}
+.dot {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.mark_main {
+    min-height: 50px;
+    line-height: 50px;
+    font-size: 50px;
 }
 /* FOOTER */
 

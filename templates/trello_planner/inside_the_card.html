@@ -7,13 +7,20 @@
   -moz-background-size: cover;
   -o-background-size: cover; 
   background-size: cover;
-  min-height: 100vh;">
+  min-height: 100vh;
+  background-color: brown !important;">
   <div class="container">
     <div class="card_header">
         <h1>{{ card.title }}</h1>
         <p>Inside the column <a href="{% url 'boards' board.pk %}" style="color: white;">{{ board }}</a></p>
         <div>
-            <a href="" class="btn btn-warning">Change card</a>
+            <div class="btn-group dropstart">
+                <a type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Change card</a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_mark_modal">Add mark</a></li>
+                    <li><a class="dropdown-item" href="">Add checklist</a></li>
+                </ul>
+            </div>
             <a href="{% url 'delete_card' board_id=board.pk card_id=card.pk %}" class="btn btn-danger">Delete card</a>
         </div>
     </div>
@@ -27,6 +34,18 @@
             </button>
         </div>
         <p>{{ card.description }}</p>
+    </div>
+
+    <hr style="color: white;">
+
+    <div class="marks_section">
+        <h1>Marks: </h1>
+        {% for mark in marks %}
+            <div class="mark_main">
+                <span class="dot" style="background-color: {{ mark.hex_color }};"></span>
+                <a href="{% url 'delete_mark' board_id=board.pk card_id=card.pk mark_id=mark.pk %}" class="btn btn-danger">delete mark</a>
+            </div>
+        {% endfor %}
     </div>
 
     <hr style="color: white;">
@@ -75,6 +94,39 @@
                 </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary" name="card_description">Change</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="add_mark_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Add new mark</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                <select class="form-select mark_select" aria-label="Default select example" name="mark_color">
+                    <option selected>Choose color</option>
+                    <option value="#00FFFF">Green mark</option>
+                    <option value="#FFFF00">Yellow mark</option>
+                    <option value="#FFA500">Orange mark</option>
+                    <option value="#FF0000">Red mark</option>
+                    <option value="#9F2B68">Purple mark</option>
+                    <option value="#0000FF">Blue mark</option>
+
+                </select>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">or add your own color(hex format)</span>
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="mark_color">
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" name="add_mark">Add</button>
             </form>
         </div>
       </div>
