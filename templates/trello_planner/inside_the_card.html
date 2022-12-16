@@ -18,7 +18,7 @@
                 <a type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Change card</a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_mark_modal">Add mark</a></li>
-                    <li><a class="dropdown-item" href="">Add checklist</a></li>
+                    <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_checklist_modal">Add checklist</a></li>
                 </ul>
             </div>
             <a href="{% url 'delete_card' board_id=board.pk card_id=card.pk %}" class="btn btn-danger">Delete card</a>
@@ -45,6 +45,62 @@
                 <span class="dot" style="background-color: {{ mark.hex_color }};"></span>
                 <a href="{% url 'delete_mark' board_id=board.pk card_id=card.pk mark_id=mark.pk %}" class="btn btn-danger">delete mark</a>
             </div>
+        {% endfor %}
+    </div>
+
+    <hr style="color: white;">
+
+    <div class="checklists_section">
+
+        {% for checklist in checklists %}
+            <div class="checklist_main">
+                <h4>{{ checklist.title }}</h4>
+                
+                {% for element in checklist.checklistelement_set.all %}
+                <div class="inside_element">
+                    {% if element.is_checked %}
+                        <i class="bi bi-check2 checked_mark"></i>
+                    {% else %}
+                        <i class="bi bi-x unchecked_mark"></i>
+                    {% endif %}
+
+                    <p>{{ element.title }}</p>
+
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {% if element.is_checked %}
+                            <input type="hidden" checked value="{{ element.pk }}" name="element">
+                        {% else %}
+                            <input type="hidden" value="{{ element.pk }}" name="element">
+                        {% endif %}
+                        <button type="submit" class="btn btn-success" name="change_cheklistelement_state">Change</button>
+                    </form>
+                    
+                </div>
+                {% endfor %}
+
+                <div class="btn-group dropup mt-4">
+                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                      Add element
+                    </button>
+                    <a type="submit" class="btn btn-danger" style="margin-left: 10px; border-radius: 5px;">Delete checklist</a>
+                    <ul class="dropdown-menu">
+
+                        <form method="post" class="checklist_element_add">
+                            {% csrf_token %}
+                            
+                            <div class="input-group mb-3">
+                                <input type="hidden" value="{{ checklist.pk }}" name="checklist">
+                                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="element_title" placeholder="add element">
+                            </div>
+            
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="add_checklist_element">Add</button>
+                        </form>
+                    </ul>
+                  </div>
+            </div>
+
         {% endfor %}
     </div>
 
@@ -123,7 +179,7 @@
                 </select>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="inputGroup-sizing-default">or add your own color(hex format)</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="mark_color">
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="mark_color_user">
                 </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary" name="add_mark">Add</button>
@@ -132,4 +188,30 @@
       </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="add_checklist_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Add checklist</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">title</span>
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="checklist_title">
+                </div>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" name="add_checklist">Add</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
 {% endblock %}

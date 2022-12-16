@@ -39,15 +39,21 @@ class Column(models.Model):
 
 class CheckList(models.Model):
     title = models.CharField(max_length=50)
-    is_checked = models.BooleanField(default=False)
 
     card_id = models.ForeignKey(Card, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
 
-# class CheckListElement(models.Model):
-#     title = models.CharField()
+class CheckListElement(models.Model):
+    title = models.CharField(max_length=50)
+    is_checked = models.BooleanField(default=False)
+
+    cheklist_id = models.ForeignKey(CheckList, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
 
 class Mark(models.Model):
     hex_color = models.CharField(max_length=10)

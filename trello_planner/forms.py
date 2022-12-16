@@ -8,3 +8,5 @@ class AddBoardForm(forms.ModelForm):
         model = Board
         fields = ('title', 'background')
 
+        
+

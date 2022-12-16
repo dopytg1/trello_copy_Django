@@ -135,6 +135,31 @@ body {
     line-height: 50px;
     font-size: 50px;
 }
+.checklists_section {
+    color: white;
+}
+
+.checklist_element_add {
+    min-width: 200px;
+    text-align: center;
+}
+.inside_element {
+    display: flex;
+    justify-content: space-between;
+    width: 30%;
+}
+.checked_mark {
+    color: green;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 20px;
+}
+.unchecked_mark {
+    color: red;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 20px;
+}
 /* FOOTER */
 
 footer {
