@@ -4,14 +4,23 @@
 {% block content %}
 
 <div class="container" style="min-height: 100vh;">
-
+    <div class="home_main">
+      <div class="search_boards_container" style="max-width: 30%; margin-top: 20px;">
+        <form class="d-flex" method="POST">
+          {% csrf_token %}
+          <input class="form-control me-2" type="search" placeholder="Search boards" name="boards-title">
+          <button class="btn btn-primary" type="submit" name="search_boards">Search</button>
+    
+        </form>
+      </div>
+    </div>
     <div class="row row-cols-1 row-cols-md-2  row-cols-lg-3 row-cols-xl-3 g-4 mt-5">
         <button type="button" class="btn btn-primary btn_create_board" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Create board
         </button>
 
         {% for board in boards %}
-          <a href="{% url 'boards' id=board.id %}" class="board_title">
+          <a href="{% url 'boards' board_id=board.id %}" class="board_title">
             {% if board.background %}
             <div class="board-main" style="
             background: url('http://127.0.0.1:8000/{{ board.background }}') no-repeat center top; -webkit-background-size: cover; 
@@ -44,7 +53,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary" >Create</button>
+                  <button type="submit" class="btn btn-primary" name="create_board">Create</button>
                 </div>
 
             </form>

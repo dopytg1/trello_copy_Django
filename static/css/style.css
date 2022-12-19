@@ -2,6 +2,23 @@ body {
     overflow-x: hidden;
 }
 
+.signup_main {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.signup_inside {
+    margin: 0 auto;
+}
+
+.login-main {
+    height: 100vh;
+    display: flex;
+}
+.main_login_page {
+    margin: 0 auto;
+    margin-top: 100px;
+}
 
 /* HOME */
 
@@ -80,6 +97,7 @@ body {
 }
 .card {
     vertical-align: top !important;
+    min-width: 300px;
 }
 .header_board {
     display: flex;

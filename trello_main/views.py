@@ -1,20 +1,15 @@
 from django.http import HttpResponse  
-from django.shortcuts import render, redirect  
-from django.contrib.auth import login, authenticate  
+from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site  
 from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage  
+from django.contrib.auth import views as auth_views
 from django.utils.encoding import force_bytes, force_str 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  
 from django.template.loader import render_to_string  
-from django.contrib.auth.models import User  
-from django.core.mail import EmailMessage  
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import logout
-from django.contrib.auth import views as auth_views
   
 from .tokens import account_activation_token  
 from .forms import SignupForm, LoginForm
-
 
 
 def signup(request):  

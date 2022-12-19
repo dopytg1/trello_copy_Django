@@ -1,23 +1,41 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse  
 
 from .forms import AddBoardForm
 from .models import Board, Column, Card, Comment, Mark, CheckList, CheckListElement
+from .permissions import (
+    user_allowed_to_the_board, user_allowed_to_the_card, 
+    user_allowed_to_delete_column, user_allowed_to_delete_mark,
+    user_allowed_to_delete_checklist)
+
+from trello_main.models import CustomUser
 
 @login_required(login_url='/login')
 def home(request):
     if request.method == "POST":
-        form = AddBoardForm(request.POST, request.FILES)
+        if 'create_board' in request.POST:
+            form = AddBoardForm(request.POST, request.FILES)
 
-        if form.is_valid():
-            board = Board.objects.create(**form.cleaned_data)
-            board.user_id.add(request.user)
+            if form.is_valid():
+                board = Board.objects.create(**form.cleaned_data)
+                board.user_id.add(request.user)
 
-            board.save()
-            return redirect("home")
-        else:
-            print(form.errors.as_data())
+                board.save()
+                return redirect("home")
+            else:
+                print(form.errors.as_data())
+        if 'search_boards' in request.POST:
+            boards_title = request.POST.get('boards-title')
+            boards = Board.objects.filter(title__contains=boards_title)
+            form = AddBoardForm()
+
+            context = {
+                "form": form,
+                "boards": boards
+            }
+
+            return render(request, 'trello_planner/home.html', context)
 
     form = AddBoardForm()
     boards = Board.objects.filter(user_id=request.user)
@@ -27,19 +45,19 @@ def home(request):
     }
     return render(request, 'trello_planner/home.html', context)
 
-@login_required(login_url='/login')
-def inside_the_board(request, id):
-    columns = Column.objects.filter(board_id=id)
-    board = Board.objects.get(pk=id)
+@user_allowed_to_the_board()
+def inside_the_board(request, board_id):
+    columns = Column.objects.filter(board_id=board_id)
+    board = Board.objects.get(pk=board_id)
 
     if request.method == "POST":
         if 'add_column' in request.POST:
             title = request.POST.get('title')
-            board = Board.objects.get(pk=id)
+            board = Board.objects.get(pk=board_id)
             column = Column.objects.create(title=title, board_id=board)
-
             column.save()
-            return redirect('boards', id)
+
+            return redirect('boards', board_id)
         elif 'add_card' in request.POST:
             head = request.POST.get('head')
             columnPk = request.POST.get('column_value')
@@ -49,7 +67,7 @@ def inside_the_board(request, id):
             column.cards_inside.add(card)
             column.save()
 
-            return redirect('boards', id)
+            return redirect('boards', board_id)
         elif 'change_board' in request.POST:
             form = AddBoardForm(request.POST, request.FILES)
 
@@ -58,20 +76,40 @@ def inside_the_board(request, id):
                 board.title = form.cleaned_data['title']
                 board.background = form.cleaned_data['background']
                 board.save()
-                return redirect('boards', id)
+                
+                return redirect('boards', board_id)
             else:
                 print(form.errors.as_data())
+        elif 'change_column' in request.POST:
+            title = request.POST.get('column_title')
+            column_pk = request.POST.get('column')
+            column = Column.objects.get(pk=column_pk)
+            column.title = title
+            column.save()
+
+            return redirect('boards', board_id)
+        elif 'add_new_user_to_the_board' in request.POST:
+            email = request.POST.get('user_email')
+            try:
+                user = CustomUser.objects.get(email=email)
+                board.user_id.add(user)
+                board.save()
+            except:
+                return HttpResponseNotFound("<h2>User not found</h2>")
+
+            return redirect('boards', board_id)
+        
 
     form_change_board = AddBoardForm()
     context = {
         'columns': columns,
-        'board_id': id,
+        'board_id': board_id,
         'board': board,
         'form_change_board': form_change_board
     }
     return render(request, 'trello_planner/inside_the_board.html', context)
 
-@login_required(login_url='/login')
+@user_allowed_to_the_card()
 def inside_the_card(request, board_id, card_id):
     board = Board.objects.get(pk=board_id)
     card = Card.objects.get(pk=card_id)
@@ -132,6 +170,13 @@ def inside_the_card(request, board_id, card_id):
             checklist_element.is_checked = False
             checklist_element.save()
             return redirect('inside_the_card', board_id, card_id)
+        
+        if 'change_date' in request.POST:
+            date = request.POST.get('date')
+            card.expiring_date = date
+            card.save()
+
+            return redirect('inside_the_card', board_id, card_id)
 
     context = {
         'board': board,
@@ -142,7 +187,8 @@ def inside_the_card(request, board_id, card_id):
     }
     return render(request, 'trello_planner/inside_the_card.html', context)
 
-@login_required(login_url='/login')
+
+@user_allowed_to_delete_column()
 def delete_column(request, board_id, column_id ):
     try:
         column = Column.objects.get(pk=column_id)
@@ -150,19 +196,19 @@ def delete_column(request, board_id, column_id ):
 
         return redirect('boards', board_id)
     except Column.DoesNotExist:
-         HttpResponseNotFound("<h2>Column not found</h2>")
+        return HttpResponseNotFound("<h2>Column not found</h2>")
 
-@login_required(login_url='/login')
-def delete_board(request, id):
+@user_allowed_to_the_board()
+def delete_board(request, board_id):
     try:
-        board = Board.objects.get(pk=id)
+        board = Board.objects.get(pk=board_id)
         board.delete()
 
         return redirect('home')
     except Board.DoesNotExist:
-         HttpResponseNotFound("<h2>Board not found</h2>")
+        return HttpResponseNotFound("<h2>Board not found</h2>")
 
-@login_required(login_url='/login')
+@user_allowed_to_the_card()
 def delete_card(request, board_id, card_id):
     try:
         card = Card.objects.get(pk=card_id)
@@ -170,9 +216,9 @@ def delete_card(request, board_id, card_id):
         card.delete()
         return redirect('boards', board_id)
     except Card.DoesNotExist:
-         HttpResponseNotFound("<h2>Card not found</h2>")
+        return HttpResponseNotFound("<h2>Card not found</h2>")
 
-@login_required(login_url='/login')
+@user_allowed_to_delete_mark()
 def delete_mark(request, board_id, card_id, mark_id):
     try:
         mark = Mark.objects.get(pk=mark_id)
@@ -180,9 +226,9 @@ def delete_mark(request, board_id, card_id, mark_id):
         mark.delete()
         return redirect('inside_the_card', board_id, card_id)
     except Mark.DoesNotExist:
-         HttpResponseNotFound("<h2>Mark not found</h2>")
+        return HttpResponseNotFound("<h2>Mark not found</h2>")
 
-@login_required(login_url='/login')
+@user_allowed_to_delete_checklist()
 def delete_checklist(request, board_id, card_id, checklist_id):
     try:
         checklist = CheckList.objects.get(pk=checklist_id)
@@ -190,4 +236,4 @@ def delete_checklist(request, board_id, card_id, checklist_id):
         checklist.delete()
         return redirect('inside_the_card', board_id, card_id)
     except CheckList.DoesNotExist:
-         HttpResponseNotFound("<h2>CheckList not found</h2>")   
+        return HttpResponseNotFound("<h2>CheckList not found</h2>")   

@@ -5,11 +5,21 @@
 <div class="container login-main">
     {{ email }}
     {{ password }}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-      
-        <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
-    </form>
+    <div class="main_login_page">
+        <form method="post">
+            {% csrf_token %} 
+            {% for field in form %}  
+            <p>  
+              {{ field.label_tag }}<br>  
+              {{ field }}  
+              {% for error in field.errors %}  
+                <p style="color: red">{{ error }}</p>  
+              {% endfor %}  
+            </p>  
+            {% endfor %}  
+          
+            <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

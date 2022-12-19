@@ -9,4 +9,3 @@ class AddBoardForm(forms.ModelForm):
         fields = ('title', 'background')
 
         
-

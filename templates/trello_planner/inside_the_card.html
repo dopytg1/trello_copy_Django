@@ -11,18 +11,29 @@
   background-color: brown !important;">
   <div class="container">
     <div class="card_header">
-        <h1>{{ card.title }}</h1>
-        <p>Inside the column <a href="{% url 'boards' board.pk %}" style="color: white;">{{ board }}</a></p>
-        <div>
-            <div class="btn-group dropstart">
-                <a type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Change card</a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_mark_modal">Add mark</a></li>
-                    <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_checklist_modal">Add checklist</a></li>
-                </ul>
+        <div style="display: flex; width: 100%; justify-content: space-between; margin-left: auto; padding-top: 40px;">
+            <h1>{{ card.title }} <span style="font-size: 15px;">Inside the column <a href="{% url 'boards' board.pk %}" style="color: white;">{{ board }}</a></span></h1>
+            
+            <div class="btn_change_delete">
+                <div class="btn-group dropstart">
+                    <a type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Change card</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_mark_modal">Add mark</a></li>
+                        <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#add_checklist_modal">Add checklist</a></li>
+                    </ul>
+                </div>
+                <a href="{% url 'delete_card' board_id=board.pk card_id=card.pk %}" class="btn btn-danger">Delete card</a>
             </div>
-            <a href="{% url 'delete_card' board_id=board.pk card_id=card.pk %}" class="btn btn-danger">Delete card</a>
         </div>
+
+        <p>Expiring date: 
+            {% if card.expiring_date %}
+                {{ card.expiring_date.date }}
+                <a href="" style="color: white;" data-bs-toggle="modal" data-bs-target="#change_date">change date</a>
+            {% else %}
+                <a href="" style="color: white;" data-bs-toggle="modal" data-bs-target="#change_date">change date</a>
+            {% endif %}
+        </p>
     </div>
 
     <hr style="color: white;">
@@ -83,7 +94,7 @@
                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                       Add element
                     </button>
-                    <a type="submit" class="btn btn-danger" style="margin-left: 10px; border-radius: 5px;">Delete checklist</a>
+                    <a href="{% url 'delete_checklist' board_id=board.pk card_id=card.pk checklist_id=checklist.pk %}" class="btn btn-danger" style="margin-left: 10px; border-radius: 5px;">Delete checklist</a>
                     <ul class="dropdown-menu">
 
                         <form method="post" class="checklist_element_add">
@@ -208,6 +219,31 @@
 
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary" name="add_checklist">Add</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="change_date" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Change date</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+                    <input type="date" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="date">
+                </div>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" name="change_date">Change</button>
             </form>
         </div>
       </div>
