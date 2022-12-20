@@ -141,8 +141,8 @@ AUTH_USER_MODEL = 'trello_main.CustomUser'
 
 EMAIL_USE_TLS = True  
 EMAIL_HOST = 'smtp.gmail.com'  
-EMAIL_HOST_USER = 'tenirberdi444@gmail.com'  
-EMAIL_HOST_PASSWORD = 'pluwakgtntzhkobv'  
+EMAIL_HOST_USER = 'email'  
+EMAIL_HOST_PASSWORD = 'password'  
 EMAIL_PORT = 587  
 
 AUTHENTICATION_BACKENDS = ['trello_main.backends.EmailBackend']
